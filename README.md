@@ -30,7 +30,7 @@ Indian literature names plants and animals constantly: the tree under which a sc
 | File | Description |
 |---|---|
 | `flora_fauna.py` | Two dictionaries, `flora_RAG_extraction` and `fauna_RAG_extraction`, mapping each book to its list of extracted entries (249 entries) |
-| `index.html` | Project webpage: lists explorer, charts, results, discussion and a sentence-highlighting demo |
+| `index.html` | Project webpage: lists explorer, charts, results and discussion |
 | `README.md` | This file |
 
 ## Usage

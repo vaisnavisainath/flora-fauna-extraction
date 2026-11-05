@@ -145,7 +145,7 @@ footer a{color:#fff}
  <li><a href="#abstract">Abstract</a></li><li><a href="#introduction">1. Introduction</a></li><li><a href="#objectives">2. Objectives</a></li>
  <li><a href="#corpus">3. Corpus</a></li><li><a href="#method">4. Method</a></li><li><a href="#files">5. Project files</a></li>
  <li><a href="#lexicon">6. Extracted lists</a></li><li><a href="#results">7. Results</a></li><li><a href="#discussion">8. Discussion</a></li>
- <li><a href="#demo">9. Demonstration</a></li><li><a href="#limitations">10. Limitations</a></li><li><a href="#conclusion">11. Conclusion</a></li><li><a href="#references">References</a></li>
+ <li><a href="#limitations">9. Limitations</a></li><li><a href="#conclusion">10. Conclusion</a></li><li><a href="#references">References</a></li>
 </ol></nav>
 
 <article>
@@ -220,33 +220,14 @@ footer a{color:#fff}
 <h3>8.3 Answer to the research question</h3>
 <p>RAG produces long, usable lists of the plants and animals in these books, with local and scientific names that give them more value than a bare word list. The lists are not ready to use without review: they were not checked against the passages, names are not standardised, and nothing yet links an entry to its passage. A reviewer should check each entry against the text and record the passage for each one.</p></section>
 
-<section id="demo"><h2><span>9</span>Demonstration</h2>
-<p>The tool below finds the extracted flora and fauna in a sentence typed in English. It uses the names of the entries without the names in brackets, treats each name joined by a slash as a separate name. Flora are shaded green with a dashed underline, and fauna are shaded brown with a solid underline. Matching ignores capital letters and a final “s”.</p>
-<div class="ui">
-<div class="ctl"><button type="button" id="s1">Sample 1</button><button type="button" id="s2">Sample 2</button></div>
-<textarea id="txt" aria-label="Text to search" rows="2" spellcheck="false">Under the mango tree the nightingale sang while the tiger slept near the lotus pond.</textarea>
-<p class="out" id="out" aria-live="polite"></p>
-<p class="stat" id="stat"></p></div>
-<p>The same lists can be loaded directly from <code>flora_fauna.py</code>:</p>
-<pre><code>import flora_fauna as ff
-
-print(len(ff.flora_RAG_extraction))    # 6 books
-print(sum(len(v) for v in ff.flora_RAG_extraction.values()))   # 120 flora entries
-print(sum(len(v) for v in ff.fauna_RAG_extraction.values()))   # 129 fauna entries
-
-book = "The Golden Threshold (Sarojini Naidu)"
-names = [e.split(" (")[0] for e in ff.flora_RAG_extraction[book]]
-print(names[:3])    # ['Lotus', 'Henna', 'Neem']</code></pre>
-<p>The sample sentences are written for this demonstration and are not quotations from the books.</p></section>
-
-<section id="limitations"><h2><span>10</span>Limitations</h2>
+<section id="limitations"><h2><span>9</span>Limitations</h2>
 <ul class="b">
 <li>The lists were not compared with a manual annotation, so precision and recall are not reported.</li>
 <li>Names are not standardised. The same plant or animal appears in several forms (for example “Vata / Banyan (Ficus indica)” in one book and “Banyan tree” in others), and the counts treat each entry as given.</li>
 <li>Entries are names only. They do not give the passage or the meaning of the plant or animal in the text, so they cannot yet show how the cultural elements are used.</li>
 <li>Six books are a small sample of Indian literature, and a larger corpus could give different results.</li></ul></section>
 
-<section id="conclusion"><h2><span>11</span>Conclusion</h2>
+<section id="conclusion"><h2><span>10</span>Conclusion</h2>
 <p>This project used RAG to extract Indian flora and fauna from six Indian literary texts and produced twelve lists with 249 entries. The lists capture the crops and trees of rural Bengal, the forest animals of Kari the Elephant, the birds of lyric poetry and the flowers and trees of the epic, and they show elements that recur across books.</p>
 <p>The lists are best used as a first draft. A next step is to check every entry against its passage, standardise names and record the passage for each entry, which would also allow precision and recall to be measured and extend the work to other Indian cultural elements.</p></section>
 
@@ -285,19 +266,6 @@ $("q").oninput=draw;$("nt").onchange=draw;draw();
 const nm=b=>b[0];
 const mx=Math.max(...BK.map(b=>Math.max(b[1].length,b[2].length)));
 $("f1").innerHTML=BK.map(b=>`<div class="n">${nm(b)}</div><div><div class="t"><i style="width:${b[1].length/mx*80}%;background:var(--bh)"></i><span>${b[1].length} flora</span></div><div class="t" style="margin-top:.2rem"><i style="width:${b[2].length/mx*80}%;background:var(--hi)"></i><span>${b[2].length} fauna</span></div></div>`).join("");
-// ---- 9. sentence highlighter
-const names=[];
-BK.forEach(b=>[1,2].forEach(idx=>b[idx].forEach(([t,f])=>{if(f)return;split(t)[0].toLowerCase().split(" / ").forEach(a=>{a=a.trim();[a,a.replace(/ tree$/,"")].forEach(n=>[n,n.endsWith("s")?n.slice(0,-1):n+"s"].forEach(v=>{if(v)names.push([v,idx])}))})})));
-const seen={};names.forEach(([v,i])=>{if(!seen[v])seen[v]=i});
-const keys=Object.keys(seen).sort((a,b)=>b.length-a.length);
-const re=new RegExp("(?<![\\p{L}-])("+keys.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")).join("|")+")(?![\\p{L}-])","giu");
-function run(){const t=$("txt").value;let f=0,a=0;
- const o=t.split(re).map((p,i)=>{if(i%2===0)return esc(p);const k=seen[p.toLowerCase()];k===1?f++:a++;return `<span class="${k===1?"mf":"ma"}">${esc(p)}</span>`}).join("");
- $("out").innerHTML=o||"Type a sentence above.";$("stat").textContent=t.trim()?`${f+a} found: ${f} flora, ${a} fauna.`:""}
-$("txt").oninput=run;
-$("s1").onclick=()=>{$("txt").value="Under the mango tree the nightingale sang while the tiger slept near the lotus pond.";run()};
-$("s2").onclick=()=>{$("txt").value="The peacock and the koil sang beneath the banyan-tree and the jasmine.";run()};
-run();
 // ---- contents highlight
 const links=[...document.querySelectorAll(".toc a")];
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.toggleAttribute("aria-current",a.getAttribute("href")==="#"+e.target.id))}}),{rootMargin:"-10% 0px -75% 0px"});
